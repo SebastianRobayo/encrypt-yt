@@ -1,5 +1,6 @@
 const client = require("../config/database");
 const { encrypt, verified } = require("../utils/encrypt");
+const { generateToken } = require("../utils/jwt");
 
 // TODO: Service to create user
 const createUser = async (req, res) => {
@@ -49,10 +50,11 @@ const login = async (req, res) => {
         const user = result.rows[0];
 
         const match = await verified(password, user.password);
+        const token = generateToken(user.email);
 
         if (match) {
           res.status(200);
-          res.json({ message: "Inicio de sesión exitoso", user });
+          res.json({ message: "Inicio de sesión exitoso", user, token });
         } else {
           res.status(401);
           res.json({ error: "Contraseña incorrecta" });
